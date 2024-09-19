@@ -41,7 +41,8 @@ public class ClassSchedule {
     public String convertJsonToCsvString(JsonObject json) {
         
         return ""; // remove this!
-        
+        if 
+                
     }
     
     public JsonObject getJson() {
