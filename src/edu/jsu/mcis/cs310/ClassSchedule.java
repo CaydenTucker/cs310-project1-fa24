@@ -33,8 +33,23 @@ public class ClassSchedule {
     private final String SUBJECTID_COL_HEADER = "subjectid";
     
     public String convertCsvToJsonString(List<String[]> csv) {
+        if (csv.isEmpty()) return "{}";
         
-        return ""; // remove this!
+        Iterator<String[]> iterator = csv.iterator();
+        String[] headers = iterator.next();
+        
+        //Maps to hold JSON objects 
+        Map<String, String> scheduleTypesMap = new LinkedHashMap<>();
+        Map<String, String> subjectsMap = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> courseMap = new LinkedHashMap<>();
+        List<Map<String, Object>> sectionList = new ArrayList<>();
+        
+        //Tracking unique values 
+        Set<String> uniqueScheduleTypes = new HashSet<>();
+        Set<String> uniqueSubjects = new Hashset<>();
+        Set<String> uniqueCourses = new Hashset<>();
+        Set<String> uniqueCRNs = new Hashset 
+        
         
     }
     
