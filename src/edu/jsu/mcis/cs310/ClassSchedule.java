@@ -34,8 +34,72 @@ public class ClassSchedule {
     
     public String convertCsvToJsonString(List<String[]> csv) {
         
-        return ""; // remove this!
+        JsonObject json = new JsonObject();
         
+        //Creating maps for both subjects and courses
+        HashMap<String, String> subjects = new HashMap<>();
+        HashMap<String, JsonObject> courses = new HashMap<>();
+        JsonArray sections = new JsonArray();
+        
+        Iterator<String[]> iterator = csv.iterator();
+        
+        //skips the header row
+        iterator.next();
+        
+        while (iterator.hasNext()){
+            String[] row = iterator.next();
+            
+            String crn = row[0];
+            String subject = row[1];
+            String num = row[2];
+            String description = row[3];
+            String section = row[4];
+            String type = row[5];
+            String credits = row[6];
+            String start = row[7];
+            String end  = row[8];
+            String days = row[9];
+            String where = row[10];
+            String schedule = row[11];
+            String instructor = row[12];
+            
+            //Populate subject map
+            subjects.put(subject, row[1]); 
+            
+            //Builds course object
+            String courseId = subject + " " + num;
+            if (!courses.containsKey(courseId)){
+                JsonObject course = new JsonObject();
+                course.put(SUBJECTID_COL_HEADER, subject);
+                course.put(NUM_COL_HEADER, num);
+                course.put(DESCRIPTION_COL_HEADER, description);
+                course.put(CREDITS_COL_HEADER, Integer.parseInt(credits));
+                courses.put(courseId, course);
+            }
+            
+            JsonObject sectionJson = new JsonObject();
+            sectionJson.put(CRN_COL_HEADER, Integer.parseInt(crn));
+            sectionJson.put(SUBJECTID_COL_HEADER, subject);
+            sectionJson.put(NUM_COL_HEADER, num);
+            sectionJson.put(SECTION_COL_HEADER, section);
+            sectionJson.put(TYPE_COL_HEADER, type);
+            sectionJson.put(START_COL_HEADER, start);
+            sectionJson.put(END_COL_HEADER, end);
+            sectionJson.put(DAYS_COL_HEADER, days);
+            sectionJson.put(WHERE_COL_HEADER, where);
+            sectionJson.put(INSTRUCTOR_COL_HEADER, new ArrayList<>(List.of(instructor)));
+            
+            sections.add(sectionJson);
+            
+        }
+        
+        //Add maps to the JSON object
+        json.put("subject", subjects);
+        json.put("course", courses);
+        json.put("section", sections);
+        
+        //Convert to JSON string and return 
+        return Jsoner.serialize(json);
     }
     
     public String convertJsonToCsvString(JsonObject json) {
