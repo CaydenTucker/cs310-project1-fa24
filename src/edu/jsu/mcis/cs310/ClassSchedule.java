@@ -63,6 +63,20 @@ public class ClassSchedule {
         return headerMap;
     }
     
+    private void addCourseDetails(String[] row, HashMap<String, Integer> headerMap,
+                                   JsonObject courseMap, String num, String subjectId,
+                                   String numWithoutCaps) {
+        if (!courseMap.containsKey(num)) {
+            JsonObject course = new JsonObject();
+            course.put(SUBJECTID_COL_HEADER, subjectId);
+            course.put(NUM_COL_HEADER, numWithoutCaps);
+            course.put(DESCRIPTION_COL_HEADER, row[headerMap.get(DESCRIPTION_COL_HEADER)]);
+            course.put(CREDITS_COL_HEADER, Integer.parseInt(row[headerMap.get(CREDITS_COL_HEADER)]));
+            courseMap.put(num, course);
+        }
+    }
+
+    
     
 
     
