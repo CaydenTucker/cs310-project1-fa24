@@ -33,60 +33,38 @@ public class ClassSchedule {
     private final String SUBJECTID_COL_HEADER = "subjectid";
     
     public String convertCsvToJsonString(List<String[]> csv) {
-        
-        JsonArray sectionArray = new JsonArray();
-        LinkedHashMap<String, LinkedHashMap<String, Object>> courseMap = new LinkedHashMap<>();
-        LinkedHashMap<String, String> scheduleTypeMap = new LinkedHashMap<>();
-        LinkedHashMap<String, String> subjectMap = new LinkedHashMap<>();
-        
-        Iterator<String[]> iterator = csv.iterator();
-        String[] headerline = iterator.next();
-        
-        while (iterator.hasNext()){
-            String[] row = iterator.next();
-            JsonObject sectionJson = new JsonObject();
-            
-            for (int i = 0; i < headerline.length; i++){
-                sectionJson.put(headerline[i], row[i]);
-            }
-            
-            scheduleTypeMap.put(sectionJson.get(TYPE_COL_HEADER).toString(), sectionJson.get(SCHEDULE_COL_HEADER).toString());
-            
-            String[] courseName = sectionJson.get(NUM_COL_HEADER).toString().split(" ");
-            subjectMap.put(courseName[0], sectionJson.get(SUBJECT_COL_HEADER).toString());
-            
-            LinkedHashMap<String, Object> courseDetails = courseMap.getOrDefault(sectionJson.get(NUM_COL_HEADER).toString(), new LinkedHashMap<>());
-            courseDetails.put(SUBJECTID_COL_HEADER, courseName[0]);
-            courseDetails.put(NUM_COL_HEADER, courseName[1]);
-            courseDetails.put(DESCRIPTION_COL_HEADER, sectionJson.get(DESCRIPTION_COL_HEADER));
-            courseDetails.put(CREDITS_COL_HEADER, Integer.parseInt(sectionJson.get(CREDITS_COL_HEADER).toString()));
-            courseMap.put(sectionJson.get(NUM_COL_HEADER).toString(), courseDetails);
-            
-            LinkedHashMap<String, Object> sectionDetails = new LinkedHashMap<>();
-            sectionDetails.put(CRN_COL_HEADER, Integer.parseInt(sectionJson.get(CRN_COL_HEADER).toString()));
-            sectionDetails.put(SUBJECT_COL_HEADER, courseName[0]);
-            sectionDetails.put(NUM_COL_HEADER, courseName[1]);
-            sectionDetails.put(SECTION_COL_HEADER, sectionJson.get(SECTION_COL_HEADER));
-            sectionDetails.put(TYPE_COL_HEADER, sectionJson.get(TYPE_COL_HEADER));
-            sectionDetails.put(START_COL_HEADER, sectionJson.get(START_COL_HEADER));
-            sectionDetails.put(END_COL_HEADER, sectionJson.get(END_COL_HEADER));
-            sectionDetails.put(DAYS_COL_HEADER, sectionJson.get(DAYS_COL_HEADER));
-            
-            String[] instructors = sectionJson.get(INSTRUCTOR_COL_HEADER).toString().split(", ");
-            sectionDetails.put(INSTRUCTOR_COL_HEADER, instructors);
-            
-            sectionArray.add(sectionDetails);
+        Iterator<String[]> csvIterator = csv.iterator();
+
+        if (!csvIterator.hasNext()) {
+            return " ";
         }
+
+        String[] headers = csvIterator.next();
+        HashMap<String, Integer> headerMap = createHeaderMap(headers);
         
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("scheduleType", scheduleTypeMap);
-        jsonObject.put("subject", subjectMap);
-        jsonObject.put("course", courseMap);
-        jsonObject.put("section", sectionArray);
-        
-        return Jsoner.serialize(jsonObject);
-        
+        JsonObject typeMap = new JsonObject();
+        JsonObject subjectsMap = new JsonObject();
+        JsonObject courseMap = new JsonObject();
+        JsonArray jsonArray = new JsonArray();
+
+        while (csvIterator.hasNext()) {
+            String[] row = csvIterator.next();
+            processCsvRow(row, headerMap, typeMap, subjectsMap, courseMap, jsonArray);
+        }
+
+        return createFinalJsonObject(typeMap, subjectsMap, courseMap, jsonArray);
     }
+
+    private HashMap<String, Integer> createHeaderMap(String[] headers) {
+        HashMap<String, Integer> headerMap = new HashMap<>();
+        for (int i = 0; i < headers.length; i++) {
+            headerMap.put(headers[i], i);
+        }
+        return headerMap;
+    }
+    
+    
+
     
     public String convertJsonToCsvString(JsonObject json) {
         
